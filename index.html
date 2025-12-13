@@ -1,99 +1,398 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Informasi Tumbuhan</title>
+  <title>Adiwiyata SD Anak Saleh - BerGRAK!</title>
+  <meta name="description"
+    content="Selamat datang di website Adiwiyata SD Anak Saleh. BerGRAK - Bersama Giatkan Rencana & Aksi untuk lingkungan.">
+
+  <!-- TailwindCSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { 'poppins': ['Poppins', 'sans-serif'] }
+          fontFamily: {
+            'outfit': ['Outfit', 'sans-serif'],
+            'jakarta': ['Plus Jakarta Sans', 'sans-serif']
+          },
+          colors: {
+            'adi-green': {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              200: '#bbf7d0',
+              300: '#86efac',
+              400: '#4ade80',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+            },
+            'adi-blue': {
+              50: '#f0f9ff',
+              500: '#0ea5e9',
+              600: '#0284c7',
+            },
+            'adi-yellow': {
+              400: '#facc15',
+              500: '#eab308',
+            }
+          }
         }
       }
     }
   </script>
+
   <style>
-    /* Wadah untuk QR Code */
-    #qrcode {
-      position: relative;
-      display: inline-block;
-      /* Penting untuk posisi absolut anaknya */
-      padding: 10px;
-      background-color: white;
-      border-radius: 8px;
+    body {
+      font-family: 'Outfit', sans-serif;
+      overflow-x: hidden;
     }
 
-    /* Logo yang akan ditempel di tengah */
-    .qrcode-logo {
+    /* Blob Backgrounds */
+    .blob {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 50px;
-      height: 50px;
-      background-color: white;
-      padding: 3px;
-      border-radius: 50%;
-      /* Membuat logo berbentuk lingkaran */
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      filter: blur(80px);
+      z-index: -1;
+      opacity: 0.6;
+    }
+
+    .blob-1 {
+      top: -10%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      background: #dcfce7;
+      border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+      animation: morph 15s ease-in-out infinite;
+    }
+
+    .blob-2 {
+      bottom: 0%;
+      left: -10%;
+      width: 500px;
+      height: 500px;
+      background: #e0f2fe;
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+      animation: morph 12s ease-in-out infinite reverse;
+    }
+
+    @keyframes morph {
+      0% {
+        border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+      }
+
+      34% {
+        border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%;
+      }
+
+      67% {
+        border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%;
+      }
+
+      100% {
+        border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+      }
+    }
+
+    /* Custom Cards */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+    }
+
+    .hover-lift {
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    }
+
+    .hover-lift:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Floating Animation for Hero Image */
+    .float-slow {
+      animation: floating 6s ease-in-out infinite;
+    }
+
+    @keyframes floating {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+
+    /* Text Gradient */
+    .text-gradient {
+      background: linear-gradient(135deg, #16a34a 0%, #0ea5e9 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
   </style>
 </head>
 
-<body class="bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 min-h-screen font-poppins">
-  <div id="main-container" class="container mx-auto px-4 py-8 md:py-16 flex items-center justify-center min-h-screen">
-    <div id="loading" class="text-center">
-      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-      <p class="mt-4 text-gray-600">Sedang memuat informasi...</p>
-    </div>
-    <main id="pohon-info" class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden hidden">
-      <img id="pohon-gambar" src="" alt="Gambar Pohon" class="w-full h-64 md:h-96 object-cover">
-      <div class="p-8 md:p-12">
-        <h2 id="pohon-nama" class="animate-element text-4xl md:text-5xl font-bold text-gray-800 mb-2"></h2>
-        <p id="pohon-nama-latin" class="animate-element text-xl text-gray-500 italic mb-6"></p>
-        <p id="pohon-deskripsi" class="animate-element text-gray-700 mb-8 leading-relaxed text-lg"></p>
-        <div class="animate-element grid md:grid-cols-2 gap-8">
-          <section>
-            <h3 class="text-2xl font-semibold text-green-600 mb-4">Manfaat</h3>
-            <ul id="pohon-manfaat" class="list-disc list-inside space-y-2 text-gray-700"></ul>
-          </section>
-          <section>
-            <h3 class="text-2xl font-semibold text-green-600 mb-4">Tips Perawatan</h3>
-            <p id="pohon-perawatan" class="text-gray-700"></p>
-          </section>
-        </div>
-        <!-- ... kode sebelumnya ... -->
-        <div id="qrcode-section" class="mt-12 pt-8 border-t border-gray-200 text-center animate-element">
-          <p class="text-gray-600 mb-4">Bagikan informasi ini dengan memindai QR Code:</p>
+<body class="bg-slate-50">
 
-          <!-- Tambahkan class cursor-pointer dan efek hover -->
-          <div id="qrcode"
-            class="inline-block p-4 bg-white rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow duration-300">
+  <!-- Background Blobs -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <!-- Navbar -->
+  <nav class="fixed w-full z-50 transition-all duration-300 px-6 py-4" id="navbar">
+    <div class="max-w-7xl mx-auto flex justify-between items-center glass-card rounded-full px-6 py-3">
+      <div class="flex items-center gap-2">
+        <div
+          class="w-10 h-10 bg-adi-green-500 rounded-full flex items-center justify-center text-white font-bold text-xl">
+          A
+        </div>
+        <span class="font-jakarta font-bold text-slate-800 text-lg">Adiwiyata</span>
+      </div>
+      <div class="hidden md:flex gap-8 font-medium text-slate-600">
+        <a href="#home" class="hover:text-adi-green-600 transition-colors">Beranda</a>
+        <a href="#about" class="hover:text-adi-green-600 transition-colors">Tentang</a>
+        <a href="#features" class="hover:text-adi-green-600 transition-colors">Program</a>
+      </div>
+      <a href="/portal-bsa.html"
+        class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2 rounded-full font-medium transition-all text-sm">
+        Masuk ke Portal BSA
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="home" class="min-h-screen pt-32 pb-20 px-4 flex items-center relative overflow-hidden">
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+
+      <!-- Text Content -->
+      <div class="space-y-8 z-10 text-center lg:text-left">
+        <div
+          class="inline-block px-4 py-2 bg-adi-green-100 text-adi-green-700 rounded-full font-semibold text-sm tracking-wide uppercase shadow-sm">
+          🌱 SD Anak Saleh Malang
+        </div>
+
+        <h1 class="font-jakarta font-extrabold text-5xl md:text-7xl text-slate-900 leading-tight">
+          Sekolah Hijau,<br>
+          <span class="text-gradient">Masa Depan</span> Cerah
+        </h1>
+
+        <p class="text-lg md:text-xl text-slate-600 max-w-lg mx-auto lg:mx-0 leading-relaxed font-light">
+          Bergabunglah dalam gerakan <span class="font-bold text-slate-800">BerGRAK!</span> Bersama Giatkan Rencana &
+          Aksi untuk lingkungan sekolah yang asri dan berkelanjutan.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+          <a href="#features"
+            class="bg-adi-green-600 hover:bg-adi-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg hover:shadow-adi-green-500/30 transition-all flex items-center justify-center gap-2 group">
+            Lihat Program
+            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+            </svg>
+          </a>
+          <a href="/portal-bsa.html"
+            class="bg-white hover:bg-slate-50 text-slate-800 font-bold py-4 px-8 rounded-full shadow-md border border-slate-200 transition-all flex items-center justify-center gap-2">
+            Masuk ke Portal BSA
+          </a>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="pt-8 grid grid-cols-3 gap-4 border-t border-slate-200">
+          <div>
+            <div class="text-3xl font-bold text-slate-900">100+</div>
+            <div class="text-sm text-slate-500">Pohon Ditanam</div>
+          </div>
+          <div>
+            <div class="text-3xl font-bold text-slate-900">50kg</div>
+            <div class="text-sm text-slate-500">Sampah Didaur</div>
+          </div>
+          <div>
+            <div class="text-3xl font-bold text-slate-900">Active</div>
+            <div class="text-sm text-slate-500">Komunitas</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Image -->
+      <div class="relative z-10 lg:h-[600px] flex items-center justify-center">
+        <!-- Main 3D Image placeholder (Assuming the generate_image was successful and placed) -->
+        <div class="relative w-full max-w-lg">
+          <div class="absolute -inset-4 bg-adi-green-300/30 rounded-full blur-2xl animate-pulse"></div>
+          <img src="./assets/images/hero.png" alt="Adiwiyata School Illustration"
+            class="relative z-10 w-full h-auto drop-shadow-2xl float-slow transform hover:scale-105 transition-transform duration-500">
+
+          <!-- Floating Cards -->
+          <div
+            class="absolute -left-8 top-1/4 bg-white p-4 rounded-2xl shadow-xl z-20 hidden md:block animate-[bounce_3s_infinite]">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
+              </div>
+              <div>
+                <div class="font-bold text-slate-800">Hemat Energi</div>
+                <div class="text-xs text-slate-500">Solar Panels Active</div>
+              </div>
+            </div>
           </div>
 
-          <!-- Tambahkan teks petunjuk kecil -->
-          <p class="text-sm text-gray-500 mt-2">Klik QR Code untuk mengunduh</p>
+          <div
+            class="absolute -right-4 bottom-1/4 bg-white p-4 rounded-2xl shadow-xl z-20 hidden md:block animate-[bounce_4s_infinite]"
+            style="animation-delay: 1s;">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                  </path>
+                </svg>
+              </div>
+              <div>
+                <div class="font-bold text-slate-800">Green Living</div>
+                <div class="text-xs text-slate-500">Zero Waste Goal</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <!-- ... kode setelahnya ... -->
       </div>
-    </main>
-    <div id="error" class="bg-white rounded-2xl shadow-2xl p-12 text-center hidden">
-      <h2 class="text-3xl font-bold text-red-500 mb-4">Oops, Tumbuhan Tidak Ditemukan</h2>
-      <p class="text-gray-600 mb-6">Maaf, kami tidak memiliki informasi untuk tumbuhan yang Anda cari.</p>
-      <a href="/"
-        class="inline-block bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 transition-colors">Kembali
-        ke Halaman Utama</a>
     </div>
-  </div>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="script.js"></script>
+  </section>
+
+  <!-- Features Grid -->
+  <section id="features" class="py-20 px-4 bg-white/50 backdrop-blur-sm">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16 max-w-2xl mx-auto">
+        <h2 class="font-jakarta font-bold text-3xl md:text-4xl text-slate-900 mb-4">Program <span
+            class="text-adi-green-600">Unggulan</span></h2>
+        <p class="text-slate-600">Kami menerapkan berbagai inisiatif untuk memastikan lingkungan belajar yang sehat dan
+          bertanggung jawab.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Feature 1 -->
+        <div class="group glass-card p-8 rounded-3xl hover-lift border-t-4 border-adi-green-500">
+          <img src="./assets/images/icon-greenhouse.png" alt="Green House"
+            class="w-24 h-auto mb-6 group-hover:scale-110 transition-transform drop-shadow-lg">
+          <h3 class="font-bold text-xl text-slate-900 mb-3">Green House</h3>
+          <p class="text-slate-500 leading-relaxed">Pusat pembelajaran pembibitan dan perawatan tanaman obat serta
+            sayuran organik.</p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="group glass-card p-8 rounded-3xl hover-lift border-t-4 border-adi-blue-500">
+          <img src="./assets/images/icon-water.png" alt="Water Management"
+            class="w-24 h-auto mb-6 group-hover:scale-110 transition-transform drop-shadow-lg">
+          <h3 class="font-bold text-xl text-slate-900 mb-3">Water Management</h3>
+          <p class="text-slate-500 leading-relaxed">Sistem panen air hujan dan biopori untuk konservasi air tanah yang
+            berkelanjutan.</p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="group glass-card p-8 rounded-3xl hover-lift border-t-4 border-adi-yellow-500">
+          <img src="./assets/images/icon-recycling.png" alt="Bank Sampah"
+            class="w-24 h-auto mb-6 group-hover:scale-110 transition-transform drop-shadow-lg">
+          <h3 class="font-bold text-xl text-slate-900 mb-3">Bank Sampah</h3>
+          <p class="text-slate-500 leading-relaxed">Edukasi pemilahan sampah dan program kreatif daur ulang bernilai
+            ekonomis.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-20 px-4">
+    <div
+      class="max-w-5xl mx-auto bg-gradient-to-r from-adi-green-600 to-emerald-600 rounded-[3rem] p-12 text-center text-white relative overflow-hidden shadow-2xl">
+      <!-- Decorative circles -->
+      <div class="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2">
+      </div>
+      <div
+        class="absolute bottom-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2">
+      </div>
+
+      <div class="relative z-10">
+        <h2 class="font-jakarta font-bold text-3xl md:text-5xl mb-6">Siap Menjadi Bagian Perubahan?</h2>
+        <p class="text-adi-green-50 text-lg mb-8 max-w-2xl mx-auto">Mari berkontribusi nyata untuk lingkungan. Mulai
+          dari hal kecil, mulai dari sekarang, mulai dari sekolah kita.</p>
+        <a href="/portal-bsa.html"
+          class="inline-block bg-white text-adi-green-600 font-bold py-4 px-10 rounded-full hover:bg-adi-green-50 transition-colors shadow-lg">
+          Masuk ke Portal BSA
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-12 bg-white border-t border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <div class="flex items-center justify-center gap-2 mb-6">
+        <div class="w-8 h-8 bg-adi-green-500 rounded-full flex items-center justify-center text-white font-bold">A</div>
+        <span class="font-bold text-slate-800 text-lg">SD Anak Saleh</span>
+      </div>
+      <p class="text-slate-500 text-sm">
+        &copy; 2025 Adiwiyata SD Anak Saleh. All rights reserved. <br>
+        Together for a darker green, cleaner future.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    gsap.from("h1", {
+      y: 50,
+      opacity: 0,
+      duration: 1,
+      ease: "power3.out",
+      delay: 0.8
+    });
+
+    gsap.from("p", {
+      y: 30,
+      opacity: 0,
+      duration: 1,
+      ease: "power3.out",
+      delay: 1,
+      stagger: 0.2
+    });
+
+    // Scroll Animations
+    gsap.utils.toArray('.hover-lift').forEach((card, i) => {
+      gsap.from(card, {
+        scrollTrigger: {
+          trigger: card,
+          start: "top 85%",
+        },
+        y: 50,
+        opacity: 0,
+        duration: 0.8,
+        delay: i * 0.1,
+        ease: "back.out(1.7)"
+      });
+    });
+  </script>
 </body>
 
 </html>
