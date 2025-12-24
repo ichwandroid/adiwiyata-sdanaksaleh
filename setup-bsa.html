@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Portal BSA - Inisialisasi Database</title>
+
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .step-card {
+            transition: all 0.3s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-error {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #22c55e;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .log-container {
+            background: #1e293b;
+            color: #e2e8f0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin-bottom: 0.5rem;
+        }
+
+        .log-success {
+            color: #86efac;
+        }
+
+        .log-error {
+            color: #fca5a5;
+        }
+
+        .log-info {
+            color: #93c5fd;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-green-50 to-blue-50 min-h-screen py-12 px-4">
+
+    <div class="max-w-4xl mx-auto">
+
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-green-500 rounded-full mb-4">
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                    </path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Setup Portal BSA</h1>
+            <p class="text-gray-600">Inisialisasi Database Firebase untuk Bank Sampah Adiwiyata</p>
+        </div>
+
+        <!-- Status Card -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold text-gray-800">Status Koneksi</h2>
+                <div id="connectionStatus" class="status-badge status-pending">
+                    <div class="spinner"></div>
+                    <span>Memeriksa...</span>
+                </div>
+            </div>
+            <div id="connectionMessage" class="text-sm text-gray-600">
+                Sedang memeriksa koneksi ke Firebase...
+            </div>
+        </div>
+
+        <!-- Setup Steps -->
+        <div class="space-y-6 mb-8">
+
+            <!-- Step 1: Check Firebase Config -->
+            <div class="step-card bg-white rounded-2xl shadow-lg p-6">
+                <div class="flex items-start gap-4">
+                    <div
+                        class="flex-shrink-0 w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">
+                        1
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Konfigurasi Firebase</h3>
+                        <p class="text-gray-600 mb-4">Pastikan file <code
+                                class="bg-gray-100 px-2 py-1 rounded text-sm">js/firebase-config.js</code> sudah
+                            dikonfigurasi dengan benar.</p>
+                        <div id="configStatus" class="text-sm text-gray-500">
+                            <span class="inline-block w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+                            Belum diperiksa
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Initialize Database -->
+            <div class="step-card bg-white rounded-2xl shadow-lg p-6">
+                <div class="flex items-start gap-4">
+                    <div
+                        class="flex-shrink-0 w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold">
+                        2
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Inisialisasi Database</h3>
+                        <p class="text-gray-600 mb-4">Buat struktur database dan collection yang diperlukan.</p>
+                        <button id="btnInitDB"
+                            class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled>
+                            Inisialisasi Database
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Add Sample Data -->
+            <div class="step-card bg-white rounded-2xl shadow-lg p-6">
+                <div class="flex items-start gap-4">
+                    <div
+                        class="flex-shrink-0 w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold">
+                        3
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">Tambah Data Contoh (Opsional)</h3>
+                        <p class="text-gray-600 mb-4">Tambahkan beberapa data contoh untuk testing.</p>
+                        <button id="btnAddSample"
+                            class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled>
+                            Tambah Data Contoh
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Log Console -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Log Console</h3>
+            <div id="logConsole" class="log-container">
+                <div class="log-entry log-info">Menunggu aksi...</div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-4 justify-center">
+            <a href="portal-bsa.html"
+                class="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors">
+                Buka Portal BSA
+            </a>
+            <button id="btnReset"
+                class="bg-red-600 hover:bg-red-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled>
+                Reset Database
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Firebase Config -->
+    <script src="./js/firebase-config.js"></script>
+
+    <!-- Setup Script -->
+    <script>
+        // Global variables
+        let db = null;
+        let isConfigured = false;
+
+        // Log function
+        function addLog(message, type = 'info') {
+            const logConsole = document.getElementById('logConsole');
+            const timestamp = new Date().toLocaleTimeString('id-ID');
+            const logClass = type === 'success' ? 'log-success' : type === 'error' ? 'log-error' : 'log-info';
+
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${logClass}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+
+            logConsole.appendChild(logEntry);
+            logConsole.scrollTop = logConsole.scrollHeight;
+        }
+
+        // Check Firebase connection
+        async function checkFirebaseConnection() {
+            try {
+                addLog('Memeriksa koneksi Firebase...', 'info');
+
+                // Check if Firebase is initialized
+                if (typeof firebase === 'undefined') {
+                    throw new Error('Firebase SDK tidak dimuat');
+                }
+
+                // Check if config is valid
+                if (!firebase.apps.length) {
+                    throw new Error('Firebase belum diinisialisasi. Periksa konfigurasi di js/firebase-config.js');
+                }
+
+                db = firebase.firestore();
+
+                // Try to read from Firestore
+                await db.collection('_test').limit(1).get();
+
+                // Success
+                document.getElementById('connectionStatus').className = 'status-badge status-success';
+                document.getElementById('connectionStatus').innerHTML = `
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Terhubung</span>
+                `;
+                document.getElementById('connectionMessage').textContent = 'Koneksi ke Firebase berhasil!';
+
+                document.getElementById('configStatus').innerHTML = `
+                    <span class="inline-block w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                    Konfigurasi valid
+                `;
+
+                addLog('✅ Koneksi Firebase berhasil!', 'success');
+                isConfigured = true;
+
+                // Enable buttons
+                document.getElementById('btnInitDB').disabled = false;
+                document.getElementById('btnReset').disabled = false;
+
+            } catch (error) {
+                document.getElementById('connectionStatus').className = 'status-badge status-error';
+                document.getElementById('connectionStatus').innerHTML = `
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Error</span>
+                `;
+                document.getElementById('connectionMessage').textContent = error.message;
+
+                document.getElementById('configStatus').innerHTML = `
+                    <span class="inline-block w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                    ${error.message}
+                `;
+
+                addLog('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // Initialize database
+        async function initializeDatabase() {
+            if (!isConfigured) {
+                addLog('❌ Firebase belum dikonfigurasi!', 'error');
+                return;
+            }
+
+            try {
+                addLog('🚀 Memulai inisialisasi database...', 'info');
+
+                // Create stats collection
+                addLog('Membuat collection stats...', 'info');
+                await db.collection('stats').doc('current').set({
+                    organik: { total: 0, monthlyChange: 0 },
+                    anorganik: { total: 0, monthlyChange: 0 },
+                    b3: { total: 0, monthlyChange: 0 },
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                addLog('✅ Collection stats berhasil dibuat', 'success');
+
+                // Create environmental_impact collection
+                addLog('Membuat collection environmental_impact...', 'info');
+                await db.collection('environmental_impact').doc('current').set({
+                    treesSaved: 0,
+                    energySaved: 0,
+                    co2Reduced: 0,
+                    lastUpdated: new Date().toISOString()
+                });
+                addLog('✅ Collection environmental_impact berhasil dibuat', 'success');
+
+                addLog('🎉 Inisialisasi database selesai!', 'success');
+
+                // Enable sample data button
+                document.getElementById('btnAddSample').disabled = false;
+
+                alert('✅ Database berhasil diinisialisasi!');
+
+            } catch (error) {
+                addLog('❌ Error: ' + error.message, 'error');
+                alert('Error saat inisialisasi: ' + error.message);
+            }
+        }
+
+        // Add sample data
+        async function addSampleData() {
+            if (!isConfigured) {
+                addLog('❌ Firebase belum dikonfigurasi!', 'error');
+                return;
+            }
+
+            try {
+                addLog('📝 Menambahkan data contoh...', 'info');
+
+                const sampleRecords = [
+                    { date: '2024-12-20', officer: 'Budi Santoso', type: 'organik', weight: 24.5, status: 'selesai' },
+                    { date: '2024-12-20', officer: 'Siti Aminah', type: 'anorganik', weight: 15.2, status: 'selesai' },
+                    { date: '2024-12-21', officer: 'Ahmad Rizky', type: 'b3', weight: 2.1, status: 'pending' },
+                    { date: '2024-12-21', officer: 'Dewi Lestari', type: 'organik', weight: 18.7, status: 'selesai' },
+                    { date: '2024-12-22', officer: 'Eko Prasetyo', type: 'anorganik', weight: 12.3, status: 'selesai' }
+                ];
+
+                for (const record of sampleRecords) {
+                    await db.collection('waste_records').add({
+                        ...record,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        createdAt: new Date().toISOString()
+                    });
+                    addLog(`✅ Data ditambahkan: ${record.date} - ${record.type} - ${record.weight}kg`, 'success');
+
+                    // Update stats
+                    await db.collection('stats').doc('current').update({
+                        [`${record.type}.total`]: firebase.firestore.FieldValue.increment(record.weight)
+                    });
+                }
+
+                addLog('🎉 Semua data contoh berhasil ditambahkan!', 'success');
+                alert('✅ Data contoh berhasil ditambahkan!');
+
+            } catch (error) {
+                addLog('❌ Error: ' + error.message, 'error');
+                alert('Error saat menambahkan data: ' + error.message);
+            }
+        }
+
+        // Reset database
+        async function resetDatabase() {
+            if (!confirm('⚠️ PERINGATAN: Ini akan menghapus SEMUA data!\n\nLanjutkan?')) {
+                return;
+            }
+
+            try {
+                addLog('🗑️ Menghapus semua data...', 'info');
+
+                // Delete all waste records
+                const snapshot = await db.collection('waste_records').get();
+                const batch = db.batch();
+
+                snapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+
+                await batch.commit();
+                addLog(`✅ ${snapshot.size} waste records dihapus`, 'success');
+
+                // Reset stats
+                await db.collection('stats').doc('current').set({
+                    organik: { total: 0, monthlyChange: 0 },
+                    anorganik: { total: 0, monthlyChange: 0 },
+                    b3: { total: 0, monthlyChange: 0 },
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                addLog('✅ Stats direset', 'success');
+
+                // Reset environmental impact
+                await db.collection('environmental_impact').doc('current').set({
+                    treesSaved: 0,
+                    energySaved: 0,
+                    co2Reduced: 0,
+                    lastUpdated: new Date().toISOString()
+                });
+                addLog('✅ Environmental impact direset', 'success');
+
+                addLog('🎉 Reset selesai!', 'success');
+                alert('✅ Database berhasil direset!');
+
+            } catch (error) {
+                addLog('❌ Error: ' + error.message, 'error');
+                alert('Error saat reset: ' + error.message);
+            }
+        }
+
+        // Event listeners
+        document.getElementById('btnInitDB').addEventListener('click', initializeDatabase);
+        document.getElementById('btnAddSample').addEventListener('click', addSampleData);
+        document.getElementById('btnReset').addEventListener('click', resetDatabase);
+
+        // Check connection on load
+        window.addEventListener('load', () => {
+            setTimeout(checkFirebaseConnection, 1000);
+        });
+    </script>
+
+</body>
+
+</html>
